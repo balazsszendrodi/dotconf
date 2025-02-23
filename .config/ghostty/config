@@ -1,0 +1,33 @@
+font-family="Hack Nerd Font"
+font-size=14
+background = 000000
+foreground = e5e5e5
+cursor-style = block
+window-padding-x = 0
+window-padding-y = 0
+window-inherit-working-directory = true
+window-inherit-font-size = true
+# window-decoration = false
+fullscreen = true
+adjust-cursor-thickness = 2
+gtk-tabs-location = top
+gtk-wide-tabs = false
+adw-toolbar-style = flat
+bold-is-bright = true
+keybind = "ctrl+shift+3=increase_font_size:1"
+keybind = "ctrl+shift+minus=decrease_font_size:1"
+keybind = "ctrl+space>c=new_tab"
+keybind = "ctrl+space>shift+2=new_split:down"
+keybind = "ctrl+space>shift+5=new_split:right"
+keybind = "ctrl+space>o=toggle_tab_overview"
+keybind = "ctrl+space>right=resize_split:right,20"
+keybind = "ctrl+space>left=resize_split:left,20"
+keybind = "ctrl+space>up=resize_split:up,20"
+keybind = "ctrl+space>down=resize_split:down,20"
+keybind = "ctrl+space>k=goto_split:top"
+keybind = "ctrl+space>j=goto_split:bottom"
+keybind = "ctrl+space>h=goto_split:left"
+keybind = "ctrl+space>l=goto_split:right"
+keybind = "ctrl+space>x=close_surface"
+keybind = "ctrl+shift+h=write_screen_file:paste"
+keybind = "ctrl+shift+j=text:\x01nvim + \n"

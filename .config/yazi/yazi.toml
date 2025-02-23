@@ -1,0 +1,22 @@
+[manager]
+show_hidden = true
+show_symlink = true
+sort_by = "modified"
+sort_reverse = true
+linemode = "mtime"
+use_ya_for_events_reading = true
+use_yazi_client_id_flag = true
+[opener]
+edit = [
+	{ run = 'nvim "$@"', block = true },
+]
+play = [
+	{ run = 'vlc "$@"', block=true,for = "unix" },
+]
+open = [
+	{ run = 'xdg-open "$@"', desc = "Open" },
+]
+[open]
+prepend_rules = [
+	{ name = "*.mkv", use = "play" },
+]
