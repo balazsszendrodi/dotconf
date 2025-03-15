@@ -15,7 +15,10 @@ export PATH=$HOME/firefox/firefox:$PATH
 export PATH=$HOME/.local/bin:$PATH
 export PATH=$HOME/bin:$PATH
 export PATH=$HOME/programming/mobile/flutter/bin:$PATH
+# Maybe its better to just simlink the whole thing to ~/.local/bin
 export PATH=$HOME/repos/neovim/build/bin:$PATH
+export PATH=$HOME/prog/go/bin:$PATH
+export PATH=$HOME/.cargo/bin/:$PATH
 export PATH=$HOME/yazi/target/release:$PATH
 export PATH=$HOME/go/bin:$PATH
 export PATH=$HOME/zen_browser/zen:$PATH
@@ -25,7 +28,7 @@ export SUDO_EDITOR=nvim
 export GOROOT=/usr/local/go
 #
 # Aliases
-source ~/.zsh_aliases
+[ -f ~/.zsh_aliases ] && source ~/.zsh_aliases
 
 fpath+=${ZDOTDIR:-~}/.zsh_functions
 
