@@ -1,0 +1,37 @@
+#!/bin/bash
+
+# enable color support of ls and also add handy aliases
+if [ -x /usr/bin/dircolors ]; then
+    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+    alias ls='ls --color=auto'
+    #alias dir='dir --color=auto'
+    #alias vdir='vdir --color=auto'
+
+    alias grep='grep --color=auto'
+    alias fgrep='fgrep --color=auto'
+    alias egrep='egrep --color=auto'
+fi
+
+# some more ls aliases
+alias ll='ls -alF'
+alias la='ls -A'
+alias l='ls -CF'
+
+# general
+alias q='exit'
+alias python='python3'
+alias lg='lazygit'
+alias cal='ncal -b'
+alias cvlc='cvlc --play-and-exit'
+alias file_size='du -hd 0'
+
+# specific
+alias todo='/home/balazs/programming/c/todo/todo'
+alias secs='/home/balazs/programming/python/projects/clock/clock_rt.py'
+alias whc='/home/balazs/programming/python/projects/working_hours_counter/hours_counter.py'
+alias whe='nvim /home/balazs/job/working_times/$(date +"%Y_%m")/$(date +"%d").txt'
+alias nf='fzf -m --preview="bat --color=always" --bind "enter:become(nvim {})"'
+alias pass_gen='/home/balazs/programming/python/projects/pass_gen/pass_gen'
+alias vpn_connect='echo $(pass show ceges/vpn_elin) | sudo openconnect --passwd-on-stdin --config=/home/balazs/job/vpn/vpn-config.txt'
+alias k="minikube kubectl --"
+alias kubectl="minikube kubectl --"
