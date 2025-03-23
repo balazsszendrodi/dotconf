@@ -26,6 +26,9 @@ export PATH=$PATH:/home/balazs/postman/Postman:$PATH
 export EDITOR=nvim
 export SUDO_EDITOR=nvim
 export GOROOT=/usr/local/go
+if [[ -n "$SSH_TTY" && "$TERM" = "xterm-ghostty" ]]; then
+    export TERM=xterm-256color
+fi
 #
 # Aliases
 [ -f ~/.zsh_aliases ] && source ~/.zsh_aliases
