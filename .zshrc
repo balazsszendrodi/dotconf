@@ -10,20 +10,12 @@ eval "$(ssh-agent -s > /dev/null)"
 export MANPAGER="nvim -c 'Man!' -o -"
 
 # Export paths
-export PATH=$HOME/programming/zig/zig-linux-x86_64-0.14.0-dev.1217+dffc8c44f:$PATH
-export PATH=$HOME/firefox/firefox:$PATH
-export PATH=$HOME/.local/bin:$PATH
-export PATH=$HOME/bin:$PATH
-export PATH=$HOME/programming/mobile/flutter/bin:$PATH
-# Maybe its better to just simlink the whole thing to ~/.local/bin
-export PATH=$HOME/repos/neovim/build/bin:$PATH
-export PATH=$HOME/prog/go/bin:$PATH
-export PATH=$HOME/.cargo/bin/:$PATH
-export PATH=$HOME/yazi/target/release:$PATH
-export PATH=$HOME/go/bin:$PATH
-export PATH=$HOME/zen_browser/zen:$PATH
-export PATH=$PATH:/home/balazs/postman/Postman:$PATH
-export EDITOR=nvim
+export PATH=$PATH:/usr/local/go/bin
+export PATH=$PATH:/home/balazs/go/bin
+export PATH=$PATH:/home/balazs/node-v22.14.0-linux-x64/bin
+export VISUAL=nvim
+export EDITOR=$VISUAL
+export GIT_EDITOR=$VISUAL
 export SUDO_EDITOR=nvim
 export GOROOT=/usr/local/go
 if [[ -n "$SSH_TTY" && "$TERM" = "xterm-ghostty" ]]; then
@@ -74,4 +66,8 @@ bindkey '^h' backward-delete-char
 bindkey '^w' backward-kill-word
 
 eval "$(starship init zsh)"
+. "$HOME/.cargo/env"
+
+http_proxy='http://10.158.100.1:8080'
+export http_proxy https_proxy="${http_proxy}" ftp_proxy="${http_proxy}" no_proxy='nokia.net'
 
