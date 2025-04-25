@@ -20,3 +20,22 @@ vim.keymap.set("n", "<c-u>", lazykeys("<c-u>zz"), { desc = "Center cursor after 
 -- Change the defualt split keymaps to mimic tmux keybinds
 vim.keymap.set("n", "<leader>%", "<C-W>s", { desc = "Split Window Below", remap = true })
 vim.keymap.set("n", '<leader>"', "<C-W>v", { desc = "Split Window Right", remap = true })
+
+-- Keep cursor in place when joining lines.
+local function smartJoinKeepCursor()
+  -- Set a temporary mark 'z'
+  vim.cmd("normal! mz") -- Only join if not on the last line
+  if vim.fn.line(".") < vim.fn.line("$") then
+    vim.cmd("normal! J")
+  end -- Jump back to the marked position
+  vim.cmd("normal! `z") -- Remove the temporary mark
+  vim.cmd("delmarks z")
+end
+vim.keymap.set("n", "J", smartJoinKeepCursor, { noremap = true, silent = true })
+-- This version does not remove mark if there is no lines left
+-- vim.keymap.set("n", "J", "mzJ`z:delmarks z<CR>", { noremap = true, silent = true })
+
+-- Duplicate line and comment the first line.
+vim.keymap.set("n", "ycc", "yygccp", { remap = true })
+--search within visual selection
+vim.keymap.set("x", "/", "<Esc>/\\%V")
