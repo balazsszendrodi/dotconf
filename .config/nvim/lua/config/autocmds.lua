@@ -14,3 +14,12 @@ vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
   end,
   group = "JenkinsfileSyntax",
 })
+
+vim.api.nvim_create_augroup("KubeConfigFileSyntax", { clear = true })
+vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
+  pattern = vim.fn.expand("~") .. "/.kube/*.config",
+  callback = function()
+    vim.bo.filetype = "yaml"
+  end,
+  group = "KubeConfigFileSyntax",
+})
