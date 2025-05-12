@@ -14,6 +14,7 @@ export PATH=$PATH:/usr/local/go/bin
 export PATH=$PATH:/home/balazs/go/bin
 export PATH=$PATH:/home/balazs/node-v22.14.0-linux-x64/bin
 export PATH=$PATH:/opt/nvim-linux-x86_64/bin
+export PATH=$PATH:/home/balazs/.local/share/nvim/mason/bin
 export VISUAL=nvim
 export EDITOR=$VISUAL
 export GIT_EDITOR=$VISUAL
@@ -43,6 +44,11 @@ function y() {
 		builtin cd -- "$cwd"
 	fi
 	rm -f -- "$tmp"
+}
+
+# Syntax highlighting for git diffs
+function batdiff() {
+    git diff --name-only --relative --diff-filter=d | xargs bat --diff
 }
 
 # Vi mode settings
@@ -75,3 +81,5 @@ export http_proxy https_proxy="${http_proxy}" ftp_proxy="${http_proxy}" no_proxy
 export HTTP_PROXY="${http_proxy}" HTTPS_PROXY="${http_proxy}" FTP_PROXY="${http_proxy}" NO_PROXY="nokia.net,localhost,127.0.0.1,${minikube_ip}"
 
 
+eval "$(uv generate-shell-completion zsh)"
+eval "$(uvx --generate-shell-completion zsh)"
