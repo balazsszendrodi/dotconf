@@ -23,3 +23,9 @@ vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
   end,
   group = "KubeConfigFileSyntax",
 })
+vim.api.nvim_create_autocmd("BufWritePre", {
+  pattern = "*.dart",
+  callback = function()
+    vim.lsp.buf.format({ async = false })
+  end,
+})
