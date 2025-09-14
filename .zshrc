@@ -15,6 +15,8 @@ export PATH=$PATH:/home/balazs/go/bin
 export PATH=$PATH:/home/balazs/node-v22.14.0-linux-x64/bin
 export PATH=$PATH:/opt/nvim-linux-x86_64/bin
 export PATH=$PATH:/home/balazs/.local/share/nvim/mason/bin
+export PATH=$PATH:/home/balazs/programming/mobile/flutter/bin
+export PATH=$PATH:/opt/android-studio/bin
 export VISUAL=nvim
 export EDITOR=$VISUAL
 export GIT_EDITOR=$VISUAL
@@ -77,8 +79,10 @@ eval "$(starship init zsh)"
 
 http_proxy='http://10.158.100.1:8080'
 minikube_ip='192.168.49.2'
-export http_proxy https_proxy="${http_proxy}" ftp_proxy="${http_proxy}" no_proxy="nokia.net,localhost,127.0.0.1,${minikube_ip}"
-export HTTP_PROXY="${http_proxy}" HTTPS_PROXY="${http_proxy}" FTP_PROXY="${http_proxy}" NO_PROXY="nokia.net,localhost,127.0.0.1,${minikube_ip}"
+if grep -qEi "(Microsoft|WSL)" /proc/version &> /dev/null; then
+  export http_proxy https_proxy="${http_proxy}" ftp_proxy="${http_proxy}" no_proxy="nokia.net,localhost,127.0.0.1,${minikube_ip}"
+  export HTTP_PROXY="${http_proxy}" HTTPS_PROXY="${http_proxy}" FTP_PROXY="${http_proxy}" NO_PROXY="nokia.net,localhost,127.0.0.1,${minikube_ip}"
+fi
 
 
 eval "$(uv generate-shell-completion zsh)"
