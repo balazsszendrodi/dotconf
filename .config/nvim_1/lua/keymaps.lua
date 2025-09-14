@@ -1,9 +1,3 @@
--- Keymaps are automatically loaded on the VeryLazy event
--- Default keymaps that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/keymaps.lua
--- Add any additional keymaps here
---
-
--- this function remove flickering when spamming ctrl+d and ctrl+u
 local function lazykeys(keys)
   keys = vim.api.nvim_replace_termcodes(keys, true, false, true)
   return function()

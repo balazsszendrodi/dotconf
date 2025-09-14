@@ -17,6 +17,7 @@ export PATH=$PATH:/opt/nvim-linux-x86_64/bin
 export PATH=$PATH:/home/balazs/.local/share/nvim/mason/bin
 export PATH=$PATH:/home/balazs/programming/mobile/flutter/bin
 export PATH=$PATH:/opt/android-studio/bin
+export PATH=$PATH:/home/balazs/.local/bin
 export VISUAL=nvim
 export EDITOR=$VISUAL
 export GIT_EDITOR=$VISUAL
@@ -77,13 +78,18 @@ bindkey '^w' backward-kill-word
 eval "$(starship init zsh)"
 . "$HOME/.cargo/env"
 
-http_proxy='http://10.158.100.1:8080'
+# http_proxy='http://10.158.100.1:8080/'
+http_proxy='10.158.100.1:8080'
 minikube_ip='192.168.49.2'
 if grep -qEi "(Microsoft|WSL)" /proc/version &> /dev/null; then
-  export http_proxy https_proxy="${http_proxy}" ftp_proxy="${http_proxy}" no_proxy="nokia.net,localhost,127.0.0.1,${minikube_ip}"
-  export HTTP_PROXY="${http_proxy}" HTTPS_PROXY="${http_proxy}" FTP_PROXY="${http_proxy}" NO_PROXY="nokia.net,localhost,127.0.0.1,${minikube_ip}"
+  export http_proxy https_proxy="${http_proxy}" ftp_proxy="${http_proxy}" no_proxy="localhost,127.0.0.1,${minikube_ip}"
+  export HTTP_PROXY="${http_proxy}" HTTPS_PROXY="${http_proxy}" FTP_PROXY="${http_proxy}" NO_PROXY="${no_proxy}"
+  export GOPROXY="https://repo.cci.nokia.net/proxy-golang-org/,https://repo.cci.nokia.net/nc-go-candidates/,direct"
+  export GONOSUMDB=gitlabe2.ext.net.nokia.com,nokia.com
 fi
 
+# export GOSUMDB="sum.golang.org https://repo-cache-pl.cci.nokia.net/sum-golang-org"
 
 eval "$(uv generate-shell-completion zsh)"
 eval "$(uvx --generate-shell-completion zsh)"
+source <(kpt completion zsh); compdef _kpt kpt

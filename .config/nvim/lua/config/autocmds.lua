@@ -23,9 +23,27 @@ vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
   end,
   group = "KubeConfigFileSyntax",
 })
+
 vim.api.nvim_create_autocmd("BufWritePre", {
   pattern = "*.dart",
   callback = function()
     vim.lsp.buf.format({ async = false })
+  end,
+})
+
+vim.api.nvim_create_augroup("LineWrapIndicatorFiles", { clear = true })
+vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
+  pattern = "*.go",
+  callback = function()
+    vim.opt.colorcolumn = "100"
+  end,
+  group = "LineWrapIndicatorFiles",
+})
+
+vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
+  pattern = "*.go",
+  callback = function()
+    vim.opt_local.makeprg = "golangci-lint run --enable-only errcheck"
+    vim.opt_local.errorformat = "%f:%l:%c: %m"
   end,
 })
