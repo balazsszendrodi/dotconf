@@ -92,4 +92,6 @@ fi
 
 eval "$(uv generate-shell-completion zsh)"
 eval "$(uvx --generate-shell-completion zsh)"
-source <(kpt completion zsh); compdef _kpt kpt
+if command -v kpt &> /dev/null && [ -x "$(command -v kpt)" ]; then source <(kpt completion zsh); compdef _kpt kpt; fi
+
+
