@@ -12,7 +12,7 @@ export MANPAGER="nvim -c 'Man!' -o -"
 # Export paths
 export PATH=$PATH:/usr/local/go/bin
 export PATH=$PATH:/home/balazs/go/bin
-export PATH=$PATH:/home/balazs/node-v22.14.0-linux-x64/bin
+export PATH=$PATH:/home/balazs/node-v22.19.0-linux-x64/bin
 export PATH=$PATH:/opt/nvim-linux-x86_64/bin
 export PATH=$PATH:/home/balazs/.local/share/nvim/mason/bin
 export PATH=$PATH:/home/balazs/programming/mobile/flutter/bin
@@ -21,7 +21,7 @@ export PATH=$PATH:/home/balazs/.local/bin
 export VISUAL=nvim
 export EDITOR=$VISUAL
 export GIT_EDITOR=$VISUAL
-export SUDO_EDITOR=nvim
+export SUDO_EDITOR=$VISUAL
 export GOROOT=/usr/local/go
 if [[ -n "$SSH_TTY" && "$TERM" = "xterm-ghostty" ]]; then
     export TERM=xterm-256color
@@ -82,7 +82,7 @@ eval "$(starship init zsh)"
 http_proxy='10.158.100.1:8080'
 minikube_ip='192.168.49.2'
 if grep -qEi "(Microsoft|WSL)" /proc/version &> /dev/null; then
-  export http_proxy https_proxy="${http_proxy}" ftp_proxy="${http_proxy}" no_proxy="localhost,127.0.0.1,${minikube_ip}"
+  export http_proxy https_proxy="${http_proxy}" ftp_proxy="${http_proxy}" no_proxy="localhost,127.0.0.1,${minikube_ip},10.154.166.224,0.0.0.0"
   export HTTP_PROXY="${http_proxy}" HTTPS_PROXY="${http_proxy}" FTP_PROXY="${http_proxy}" NO_PROXY="${no_proxy}"
   export GOPROXY="https://repo.cci.nokia.net/proxy-golang-org/,https://repo.cci.nokia.net/nc-go-candidates/,direct"
   export GONOSUMDB=gitlabe2.ext.net.nokia.com,nokia.com
@@ -95,3 +95,9 @@ eval "$(uvx --generate-shell-completion zsh)"
 if command -v kpt &> /dev/null && [ -x "$(command -v kpt)" ]; then source <(kpt completion zsh); compdef _kpt kpt; fi
 
 
+# fnm
+FNM_PATH="/home/balazs/.local/share/fnm"
+if [ -d "$FNM_PATH" ]; then
+  export PATH="$FNM_PATH:$PATH"
+  eval "`fnm env`"
+fi
