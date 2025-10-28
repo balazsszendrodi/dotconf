@@ -7,12 +7,15 @@ vim.pack.add({
   { src = "https://github.com/folke/tokyonight.nvim" },
   { src = "https://github.com/nvim-mini/mini.icons" },
   { src = "https://github.com/nvim-mini/mini.pick" },
+  -- {src = "https://github.com/ibhagwan/fzf-lua"}, -- alternate picker
+  -- {src = "https://github.com/nvim-telescope/telescope.nvim"}, -- alternate picker
   { src = "https://github.com/nvim-mini/mini.ai" },
   -- { src = "https://github.com/nvim-mini/mini.files" },
   { src = "https://github.com/nvim-lua/plenary.nvim" }, --dependency of yazi.nvim
   { src = "https://github.com/mikavilpas/yazi.nvim" },
   { src = "https://github.com/lewis6991/gitsigns.nvim" },
   { src = "https://github.com/nvim-treesitter/nvim-treesitter" },
+  { src = "https://github.com/nvim-treesitter/nvim-treesitter-context" }, -- Shows the the signiture of the funciton on the top while in the scope
   { src = "https://github.com/nvim-lualine/lualine.nvim" },
 })
 vim.cmd("colorscheme tokyonight-moon")

@@ -119,5 +119,7 @@ MiniPick.setup(
 -- Keymap
 vim.keymap.set("n", "<leader> ", ":Pick files<CR>", { desc = "Pick files" })
 vim.keymap.set("n", "<leader>sh", ":Pick help<CR>", { desc = "Pick help" })
+vim.keymap.set("n", "<leader>sk", ":Pick keymaps<CR>", { desc = "Pick keymaps" })
+vim.keymap.set("n", "<leader>sc", ":Pick commands<CR>", { desc = "Pick commands" })
 vim.keymap.set("n", "<leader>/", ":Pick grep_live<CR>", { desc = "Live grep" })
 vim.keymap.set("n", "<leader>,", ":Pick buffers<CR>", { desc = "Pick buffers" })
