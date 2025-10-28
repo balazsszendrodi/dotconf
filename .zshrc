@@ -23,6 +23,7 @@ export EDITOR=$VISUAL
 export GIT_EDITOR=$VISUAL
 export SUDO_EDITOR=$VISUAL
 export GOROOT=/usr/local/go
+export BROWSER='/mnt/c/Program\ Files/Mozilla\ Firefox/firefox.exe'
 if [[ -n "$SSH_TTY" && "$TERM" = "xterm-ghostty" ]]; then
     export TERM=xterm-256color
 fi
@@ -101,3 +102,11 @@ if [ -d "$FNM_PATH" ]; then
   export PATH="$FNM_PATH:$PATH"
   eval "`fnm env`"
 fi
+
+# Upadte nvim to the latest nightly version
+function update-nvim(){
+curl -LO https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.tar.gz
+sudo rm -rf /opt/nvim-linux-x86_64
+sudo tar -C /opt -xzf nvim-linux-x86_64.tar.gz
+rm nvim-linux-x86_64.tar.gz
+}
