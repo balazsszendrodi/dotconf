@@ -6,8 +6,8 @@ require("autocmds")
 vim.pack.add({
   { src = "https://github.com/folke/tokyonight.nvim" },
   { src = "https://github.com/nvim-mini/mini.icons" },
-  { src = "https://github.com/nvim-mini/mini.pick" },
-  -- {src = "https://github.com/ibhagwan/fzf-lua"}, -- alternate picker
+  -- { src = "https://github.com/nvim-mini/mini.pick" },
+  {src = "https://github.com/ibhagwan/fzf-lua"}, -- alternate picker
   -- {src = "https://github.com/nvim-telescope/telescope.nvim"}, -- alternate picker
   { src = "https://github.com/nvim-mini/mini.ai" },
   -- { src = "https://github.com/nvim-mini/mini.files" },
@@ -23,9 +23,10 @@ vim.cmd(":hi statusline guibg=NONE")
 
 -- Plugins
 require('plugins.mini.icons')
-require('plugins.mini.pick')
+-- require('plugins.mini.pick')
 require('plugins.mini.ai')
 -- require('plugins.mini.files') -- alternative to yazi.nvim with 0 dependencies
+require('plugins.fzf-lua')
 require('plugins.yazi')
 require('plugins.gitsigns')
 require('plugins.treesitter')
