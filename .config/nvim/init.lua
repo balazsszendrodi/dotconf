@@ -49,5 +49,6 @@ lsp.enable({
   "ruff",
   "pyright",
   "gopls",
-  "protols"
+  "protols",
+  -- "copilot", -- TODO: Apply the command in lsp/copilot.lua to attach to sessions
 })
