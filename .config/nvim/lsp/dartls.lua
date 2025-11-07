@@ -20,6 +20,7 @@ return {
     dart = {
       completeFunctionCalls = true,
       showTodos = true,
+      enableSdkFormatter = true,
     },
   },
 }
