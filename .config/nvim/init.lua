@@ -49,7 +49,8 @@ lsp.config('*', {
 lsp.enable({
   "lua_ls",
   "ruff",
-  "pyright",
+  -- "pyright",
+  "pyrefly",
   "gopls",
   "protols",
   -- "copilot", -- TODO: Apply the command in lsp/copilot.lua to attach to sessions
