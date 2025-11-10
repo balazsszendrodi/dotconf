@@ -54,4 +54,5 @@ lsp.enable({
   "gopls",
   "protols",
   -- "copilot", -- TODO: Apply the command in lsp/copilot.lua to attach to sessions
+  "dartls"
 })
