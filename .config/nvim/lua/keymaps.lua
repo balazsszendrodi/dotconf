@@ -225,4 +225,5 @@ map("n", "[[", function() print("prev reference not implemented") end, { desc = 
 map("n", "<a-n>", function() print("next reference not implemented") end, { desc = "Next Reference" })
 map("n", "<a-p>", function() print("prev reference not implemented") end, { desc = "Prev Reference" })
 
-
+--completion
+map("i", "<C-f>", "<C-x><C-f>", { desc = "Trigger file completion" })
