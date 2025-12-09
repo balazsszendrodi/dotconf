@@ -23,7 +23,7 @@ export EDITOR=$VISUAL
 export GIT_EDITOR=$VISUAL
 export SUDO_EDITOR=$VISUAL
 export GOROOT=/usr/local/go
-export BROWSER='/mnt/c/Program\ Files/Mozilla\ Firefox/firefox.exe'
+
 if [[ -n "$SSH_TTY" && "$TERM" = "xterm-ghostty" ]]; then
     export TERM=xterm-256color
 fi
@@ -80,11 +80,19 @@ eval "$(starship init zsh)"
 . "$HOME/.cargo/env"
 
 # http_proxy='http://10.158.100.1:8080/'
-http_proxy='10.158.100.1:8080'
 minikube_ip='192.168.49.2'
 if grep -qEi "(Microsoft|WSL)" /proc/version &> /dev/null; then
-  export http_proxy https_proxy="${http_proxy}" ftp_proxy="${http_proxy}" no_proxy="localhost,127.0.0.1,${minikube_ip},10.154.166.224,0.0.0.0"
-  export HTTP_PROXY="${http_proxy}" HTTPS_PROXY="${http_proxy}" FTP_PROXY="${http_proxy}" NO_PROXY="${no_proxy}"
+  export BROWSER=brave-browser
+
+  http_proxy='http://10.158.100.2:8080'
+  https_proxy='http://10.158.100.2:8080'
+  ftp_proxy='http://10.158.100.2:8080'
+  no_proxy="${minikube_ip},localhost,127.0.0.1,instance-data,169.254.169.254,10.135.73.50,.nokia.net,.nsn-net.net,.nsn-rdnet.net,.nokia.com,.nsn.com,.nokiasiemensnetworks.com,.alcatel-lucent. com,.internal,.testing"
+  HTTP_PROXY='http://10.158.100.2:8080'
+  HTTPS_PROXY='http://10.158.100.2:8080'
+  FTP_PROXY='http://10.158.100.2:8080'
+  NO_PROXY="${minikube_ip},localhost,127.0.0.1,instance-data,169.254.169.254,10.135.73.50,.nokia.net,.nsn-net.net,.nsn-rdnet.net,.nokia.com,.nsn.com,.nokiasiemensnetworks.com,.alcatel-lucent. com,.internal,.testing"
+  export http_proxy https_proxy ftp_proxy no_proxy HTTP_PROXY HTTPS_PROXY FTP_PROXY NO_PROXY
   export GOPROXY="https://repo.cci.nokia.net/proxy-golang-org/,https://repo.cci.nokia.net/nc-go-candidates/,direct"
   export GONOSUMDB=gitlabe2.ext.net.nokia.com,nokia.com
 fi
@@ -110,3 +118,7 @@ sudo rm -rf /opt/nvim-linux-x86_64
 sudo tar -C /opt -xzf nvim-linux-x86_64.tar.gz
 rm nvim-linux-x86_64.tar.gz
 }
+
+
+# Load Angular CLI autocompletion.
+source <(ng completion script)
