@@ -1,27 +1,35 @@
 {
   "plugins": {
     "fzf-lua": {
-      "rev": "a8458b7",
+      "rev": "de0fd4a21ee29cf6532d0c3bcae08a0b25d99b6a",
       "src": "https://github.com/ibhagwan/fzf-lua"
     },
     "gitsigns.nvim": {
-      "rev": "20ad441",
+      "rev": "5813e4878748805f1518cee7abb50fd7205a3a48",
       "src": "https://github.com/lewis6991/gitsigns.nvim"
     },
     "lualine.nvim": {
-      "rev": "3946f01",
+      "rev": "47f91c416daef12db467145e16bed5bbfe00add8",
       "src": "https://github.com/nvim-lualine/lualine.nvim"
     },
     "mini.ai": {
-      "rev": "11c5718",
+      "rev": "bfb26d9072670c3aaefab0f53024b2f3729c8083",
       "src": "https://github.com/nvim-mini/mini.ai"
     },
+    "mini.diff": {
+      "rev": "fbb93ea1728e7c9d0944df8bd022a68402bd2e7e",
+      "src": "https://github.com/nvim-mini/mini.diff"
+    },
+    "mini.files": {
+      "rev": "26baa6215c2e5c40ba7fe82685d827fe8e5c68c8",
+      "src": "https://github.com/nvim-mini/mini.files"
+    },
     "mini.icons": {
-      "rev": "2847986",
+      "rev": "ff2e4f1d29f659cc2bad0f9256f2f6195c6b2428",
       "src": "https://github.com/nvim-mini/mini.icons"
     },
     "mini.pick": {
-      "rev": "bb764a5",
+      "rev": "b4351399db5043a781a32699a1bde60b747f711f",
       "src": "https://github.com/nvim-mini/mini.pick"
     },
     "nvim-treesitter": {
@@ -29,23 +37,27 @@
       "src": "https://github.com/nvim-treesitter/nvim-treesitter"
     },
     "nvim-treesitter-context": {
-      "rev": "ec308c7",
+      "rev": "64dd4cf3f6fd0ab17622c5ce15c91fc539c3f24a",
       "src": "https://github.com/nvim-treesitter/nvim-treesitter-context"
     },
     "nvim-treesitter-textobjects": {
-      "rev": "5ca4aaa",
+      "rev": "5ca4aaa6efdcc59be46b95a3e876300cfead05ef",
       "src": "https://github.com/nvim-treesitter/nvim-treesitter-textobjects"
+    },
+    "nvim-web-devicons": {
+      "rev": "8dcb311b0c92d460fac00eac706abd43d94d68af",
+      "src": "https://github.com/nvim-tree/nvim-web-devicons"
     },
     "plenary.nvim": {
       "rev": "b9fd522",
       "src": "https://github.com/nvim-lua/plenary.nvim"
     },
     "tokyonight.nvim": {
-      "rev": "2642dbb",
+      "rev": "5da1b76e64daf4c5d410f06bcb6b9cb640da7dfd",
       "src": "https://github.com/folke/tokyonight.nvim"
     },
     "yazi.nvim": {
-      "rev": "d5eb45f",
+      "rev": "3bd585a908d7555d9d08ca1bfe5cc2c70e13d8b1",
       "src": "https://github.com/mikavilpas/yazi.nvim"
     }
   }

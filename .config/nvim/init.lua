@@ -19,6 +19,7 @@ vim.pack.add({
   { src = "https://github.com/nvim-treesitter/nvim-treesitter-textobjects" },
   { src = "https://github.com/nvim-lualine/lualine.nvim" },
 })
+-- vim.pack.update() -- udpate all plugins managed by vim.pack
 vim.cmd("colorscheme tokyonight-moon")
 vim.cmd(":hi statusline guibg=NONE")
 
