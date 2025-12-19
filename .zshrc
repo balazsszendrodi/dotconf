@@ -51,7 +51,7 @@ function y() {
 }
 
 # Syntax highlighting for git diffs
-function batdiff() {
+function batdiff {
     git diff --name-only --relative --diff-filter=d | xargs bat --diff
 }
 
@@ -112,11 +112,21 @@ if [ -d "$FNM_PATH" ]; then
 fi
 
 # Upadte nvim to the latest nightly version
-function update-nvim(){
+function update-nvim {
 curl -LO https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.tar.gz
 sudo rm -rf /opt/nvim-linux-x86_64
 sudo tar -C /opt -xzf nvim-linux-x86_64.tar.gz
 rm nvim-linux-x86_64.tar.gz
+}
+
+# pass-gen <password-length>
+function pass-gen {
+if [ $# -lt 1 ]
+  then
+    echo "Usage: pass-gen <password-length>"
+    return
+  fi
+  tr -dc A-Za-z0-9 </dev/urandom | head -c "$1"; echo
 }
 
 

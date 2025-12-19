@@ -140,7 +140,7 @@ api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
   pattern = "*.go",
   callback = function()
     -- vim.opt_local.makeprg = "golangci-lint run --enable-only errcheck"
-    vim.opt_local.makeprg = "go build"
+    vim.opt_local.makeprg = "go build -o /dev/null"
     vim.opt_local.errorformat = "%f:%l:%c: %m"
   end,
 })
@@ -149,6 +149,8 @@ api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
 vim.api.nvim_create_autocmd("QuickFixCmdPost", {
   pattern = { "make" },
   callback = function()
+    -- Close the quickfix list if it was left open
+    vim.cmd("cclose")
     -- Only open if there are entries
     if vim.fn.getqflist({ size = 0 }).size > 0 then
       vim.cmd("copen")
