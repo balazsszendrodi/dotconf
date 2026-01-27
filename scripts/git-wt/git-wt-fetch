@@ -1,0 +1,81 @@
+#!/bin/bash
+# git-wt-fetch - Fetch updates from remote
+# Usage: git-wt-fetch [--all]
+
+set -e
+
+usage() {
+    echo "Usage: git-wt-fetch [options]"
+    echo ""
+    echo "Fetch updates from remote."
+    echo ""
+    echo "Options:"
+    echo "  --all      Fetch all branches including excluded ones"
+    echo "  --branch   Fetch a specific branch"
+    echo "  --help     Show this help message"
+    exit 1
+}
+
+# Find the repository root
+find_repo_root() {
+    local dir="$PWD"
+    while [[ "$dir" != "/" ]]; do
+        if [[ -f "$dir/.git" ]] || [[ -d "$dir/.bare" ]]; then
+            echo "$dir"
+            return 0
+        fi
+        dir=$(dirname "$dir")
+    done
+    return 1
+}
+
+FETCH_ALL=false
+SPECIFIC_BRANCH=""
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --all|-a)
+            FETCH_ALL=true
+            shift
+            ;;
+        --branch|-b)
+            SPECIFIC_BRANCH="$2"
+            shift 2
+            ;;
+        --help|-h)
+            usage
+            ;;
+        *)
+            shift
+            ;;
+    esac
+done
+
+# Find repository root
+REPO_ROOT=$(find_repo_root) || {
+    echo "Error: Not in a git-wt managed repository"
+    exit 1
+}
+
+BARE_DIR="$REPO_ROOT/.bare"
+cd "$BARE_DIR"
+
+if [[ -n "$SPECIFIC_BRANCH" ]]; then
+    echo "==> Fetching branch '$SPECIFIC_BRANCH'..."
+    git fetch origin "$SPECIFIC_BRANCH:refs/remotes/origin/$SPECIFIC_BRANCH"
+elif [[ "$FETCH_ALL" == true ]]; then
+    echo "==> Fetching all branches (including excluded)..."
+    # Temporarily remove negative refspec and fetch all
+    EXCLUDED_BRANCH=$(git config --get worktree.excludedBranch 2>/dev/null || echo "")
+    
+    # Fetch everything
+    git fetch origin "+refs/heads/*:refs/remotes/origin/*"
+    
+    echo "==> Fetched all branches including '$EXCLUDED_BRANCH'"
+else
+    echo "==> Fetching remote branches..."
+    git fetch origin
+fi
+
+echo "==> Fetch complete!"

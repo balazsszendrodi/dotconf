@@ -1,0 +1,86 @@
+#!/bin/bash
+# git-wt-list - List all worktrees and available branches
+# Usage: git-wt-list [--all]
+
+set -e
+
+usage() {
+  echo "Usage: git-wt-list [options]"
+  echo ""
+  echo "List worktrees and branches."
+  echo ""
+  echo "Options:"
+  echo "  --all      Show all remote branches (including excluded)"
+  echo "  --help     Show this help message"
+  exit 1
+}
+
+# Find the repository root
+find_repo_root() {
+  local dir="$PWD"
+  while [[ "$dir" != "/" ]]; do
+    if [[ -f "$dir/.git" ]] || [[ -d "$dir/.bare" ]]; then
+      echo "$dir"
+      return 0
+    fi
+    dir=$(dirname "$dir")
+  done
+  return 1
+}
+
+SHOW_ALL=false
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+  case $1 in
+  --all | -a)
+    SHOW_ALL=true
+    shift
+    ;;
+  --help | -h)
+    usage
+    ;;
+  *)
+    shift
+    ;;
+  esac
+done
+
+# Find repository root
+REPO_ROOT=$(find_repo_root) || {
+  echo "Error: Not in a git-wt managed repository"
+  exit 1
+}
+
+BARE_DIR="$REPO_ROOT/.bare"
+
+echo "=== Active Worktrees ==="
+git --git-dir="$BARE_DIR" worktree list
+echo ""
+
+echo "=== Remote Branches ==="
+EXCLUDED_BRANCH=$(git --git-dir="$BARE_DIR" config --get worktree.excludedBranch 2>/dev/null || echo "")
+
+git --git-dir="$BARE_DIR" branch -r | grep -v HEAD | while read branch; do
+  branch_name=$(echo "$branch" | sed 's/origin\///' | xargs)
+  worktree_name=$(echo "$branch_name" | tr '/' '.')
+  worktree_path="$REPO_ROOT/$worktree_name"
+
+  status=""
+  if [[ -d "$worktree_path" ]]; then
+    status="[worktree active]"
+  fi
+
+  if [[ "$branch_name" == "$EXCLUDED_BRANCH" ]]; then
+    if [[ "$SHOW_ALL" == true ]]; then
+      echo "  $branch_name [EXCLUDED - contains binaries] $status"
+    fi
+  else
+    echo "  $branch_name $status"
+  fi
+done
+
+if [[ -n "$EXCLUDED_BRANCH" ]] && [[ "$SHOW_ALL" != true ]]; then
+  echo ""
+  echo "(Branch '$EXCLUDED_BRANCH' is hidden. Use --all to show)"
+fi

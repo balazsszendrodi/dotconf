@@ -1,0 +1,143 @@
+# Exit yazi on the cwd instead of where it was invoked from. To avoid this press 'Q' to quit instead of 'q'
+function y() {
+  local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+  command yazi "$@" --cwd-file="$tmp"
+  IFS= read -r -d '' cwd <"$tmp"
+  [ "$cwd" != "$PWD" ] && [ -d "$cwd" ] && builtin cd -- "$cwd"
+  rm -f -- "$tmp"
+}
+
+# function for appending a path to the $PATH environment variable
+function appendpath() {
+  # Check if argument is provided
+  if [ $# -eq 0 ]; then
+    echo "Usage: expandpath <path_to_add>"
+    return 1
+  fi
+
+  local new_path="$1"
+
+  # Expand tilde (~) to home directory if present
+  new_path="${new_path/#\~/$HOME}"
+
+  # Check if path exists
+  if [ ! -d "$new_path" ]; then
+    echo "Warning: Directory '$new_path' does not exist"
+    return 1
+  fi
+
+  # Check if path is already in PATH
+  case ":$PATH:" in
+  *":$new_path:"*)
+    # echo "Path '$new_path' is already in PATH"
+    return 0
+    ;;
+  esac
+
+  # Append to PATH
+  export PATH="$PATH:$new_path"
+  # echo "Added '$new_path' to PATH"
+}
+
+
+function check_git_exists() {
+  if ! command -v git &>/dev/null; then
+    echo "❌ 'git' command not found. Please install Git." >&2
+    return 1
+  fi
+  return 0
+}
+
+# Git MR checkout function that creates a worktree and changes into that changes directory
+# usage: cmr <MR_NUMBER> [REMOTE]
+function cmr() {
+  local MR="$1"
+  local REMOTE="${2:-origin}"
+
+
+  if ! check_git_exists; then
+    echo "❌ Git is not installed or not found in PATH." >&2
+    return 1
+  fi
+
+  if ! command -v glab &>/dev/null; then
+    echo "❌ 'glab' command not found. Please install GitLab CLI." >&2
+    return 1
+  fi
+
+  if ! command -v jq &>/dev/null; then
+    echo "❌ 'jq' command not found. Please install jq." >&2
+    return 1
+  fi
+
+  if [[ -z "$MR" ]]; then
+    echo "Usage: git-wtc-mr <MR_NUMBER> [REMOTE]" >&2
+    echo "Available MRs:"
+    glab mr list
+    echo "Please provide a Merge Request number." >&2
+    return 1
+  fi
+
+
+  # Source utilities
+  source "$HOME/.local/bin/git-utils.sh"
+
+
+  echo "Fetching MR #$MR info..."
+  local MR_INFO BRANCH TITLE PROCESSED_TITLE WORKTREE
+  MR_INFO=$(glab mr view "$MR" -F json)
+  BRANCH=$(echo "$MR_INFO" | jq -r '.source_branch')
+  TITLE=$(echo "$MR_INFO" | jq -r '.title')
+  PROCESSED_TITLE=$(process_mr_title "$TITLE")
+  WORKTREE="../mr-$MR-$PROCESSED_TITLE"
+
+  echo "Creating worktree: $WORKTREE"
+  if create_worktree "$WORKTREE" "$BRANCH" "$REMOTE"; then
+    echo "✅ MR #$MR checked out to worktree: $WORKTREE"
+    cd "$WORKTREE" || return 1
+    return 0
+  else
+    echo "❌ Failed to checkout MR #$MR" >&2
+    return 1
+  fi
+}
+
+# Git branch checkout function that creates a worktree and changes into that changes directory
+# usage: cbr <BRANCH_NAME> [REMOTE]
+function cbr() {
+  local BRANCH="$1"
+  local REMOTE="${2:-origin}"
+
+  if ! check_git_exists; then
+    echo "❌ Git is not installed or not found in PATH." >&2
+    return 1
+  fi
+
+  if [[ -z "$BRANCH" ]]; then
+    echo "Usage: git-wtc-branch <BRANCH_NAME> [REMOTE]" >&2
+    echo "Available branches:"
+    git branch -a
+    echo "Please provide a branch name." >&2
+    return 1
+  fi
+
+  # Source utilities
+  source "$HOME/.local/bin/git-utils.sh"
+
+  PROCESSED_BRANCH=$(process_mr_title "$BRANCH")
+  WORKTREE="../branch-$PROCESSED_BRANCH"
+
+  echo "Creating worktree: $WORKTREE"
+  if create_worktree "$WORKTREE" "$BRANCH" "$REMOTE"; then
+    echo "✅ Branch '$BRANCH' checked out to worktree: $WORKTREE"
+    cd "$WORKTREE" || return 1
+    return 0
+  else
+    echo "❌ Failed to checkout branch '$BRANCH'" >&2
+    return 1
+  fi
+}
+
+
+# Source git-wt script
+source "$HOME/scripts/git-wt/git-wt.sh"

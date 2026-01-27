@@ -1,0 +1,89 @@
+#!/bin/bash
+# git-wt-remove - Remove a worktree
+# Usage: git-wt-remove <branch-name> [--force]
+
+set -e
+
+usage() {
+  echo "Usage: git-wt-remove <branch-name> [options]"
+  echo ""
+  echo "Remove a git worktree."
+  echo ""
+  echo "Options:"
+  echo "  --force    Force remove even with uncommitted changes"
+  echo "  --help     Show this help message"
+  echo ""
+  echo "Example:"
+  echo "  git-wt-remove feature/my-feature"
+  exit 1
+}
+
+# Find the repository root
+find_repo_root() {
+  local dir="$PWD"
+  while [[ "$dir" != "/" ]]; do
+    if [[ -f "$dir/.git" ]] || [[ -d "$dir/.bare" ]]; then
+      echo "$dir"
+      return 0
+    fi
+    dir=$(dirname "$dir")
+  done
+  return 1
+}
+
+BRANCH=""
+FORCE=""
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+  case $1 in
+  --force | -f)
+    FORCE="--force"
+    shift
+    ;;
+  --help | -h)
+    usage
+    ;;
+  *)
+    if [[ -z "$BRANCH" ]]; then
+      BRANCH="$1"
+    fi
+    shift
+    ;;
+  esac
+done
+
+if [[ -z "$BRANCH" ]]; then
+  echo "Error: Branch name is required"
+  usage
+fi
+
+# Find repository root
+REPO_ROOT=$(find_repo_root) || {
+  echo "Error: Not in a git-wt managed repository"
+  exit 1
+}
+
+BARE_DIR="$REPO_ROOT/.bare"
+WORKTREE_NAME=$(echo "$BRANCH" | tr '/' '.')
+WORKTREE_PATH="$REPO_ROOT/$WORKTREE_NAME"
+
+if [[ ! -d "$WORKTREE_PATH" ]]; then
+  echo "Error: Worktree not found: $WORKTREE_PATH"
+  echo ""
+  echo "Available worktrees:"
+  git --git-dir="$BARE_DIR" worktree list
+  exit 1
+fi
+
+# Make sure we're not in the worktree we're trying to remove
+if [[ "$PWD" == "$WORKTREE_PATH"* ]]; then
+  echo "Error: Cannot remove worktree while inside it"
+  echo "Please cd to a different directory first"
+  exit 1
+fi
+
+echo "==> Removing worktree '$BRANCH'..."
+git --git-dir="$BARE_DIR" worktree remove $FORCE "$WORKTREE_PATH"
+
+echo "==> Worktree removed successfully!"

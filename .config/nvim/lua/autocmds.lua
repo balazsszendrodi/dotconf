@@ -112,6 +112,7 @@ vim.api.nvim_create_autocmd({ "BufWritePre" }, {
 })
 
 
+-- Syntax highlight for non standard Jenkins file names
 api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
   pattern = "Jenkinsfile*",
   callback = function()
@@ -120,6 +121,7 @@ api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
   group = api.nvim_create_augroup("JenkinsfileSyntax", { clear = true }),
 })
 
+-- YAML Syntax highlight for kubeconfig
 api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
   pattern = vim.fn.expand("~") .. "/.kube/*.config",
   callback = function()
@@ -128,20 +130,35 @@ api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
   group = api.nvim_create_augroup("KubeConfigFileSyntax", { clear = true }),
 })
 
+-- Enable 120 line indicator for go files
 api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
   pattern = "*.go",
   callback = function()
-    vim.opt.colorcolumn = "100"
+    vim.opt.colorcolumn = "120"
   end,
   group = api.nvim_create_augroup("LineWrapIndicatorFiles", { clear = true }),
 })
 
+-- Custom make command for go files
 api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
   pattern = "*.go",
   callback = function()
-    -- vim.opt_local.makeprg = "golangci-lint run --enable-only errcheck"
-    vim.opt_local.makeprg = "go build -o /dev/null"
+    vim.opt_local.makeprg = "golangci-lint run"
+    -- vim.opt_local.makeprg = "go build -o /dev/null"
     vim.opt_local.errorformat = "%f:%l:%c: %m"
+  end,
+})
+
+-- Custom make command for python files
+api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
+  pattern = "*.py",
+  callback = function()
+    -- vim.opt_local.makeprg = "ruff check --respect-gitignore --output-format='concise'"
+    -- vim.opt_local.makeprg = "pyrefly check --output-format min-text"
+    vim.opt_local.makeprg = "mypy ."
+    vim.opt_local.errorformat = "%f:%l: %m"
+    -- vim.opt_local.errorformat = "%E%f:%l:%c%*[^:]: %m"
+    -- vim.opt_local.errorformat = "ERROR %f:%l:%c-%*[0-9]: %m"
   end,
 })
 
@@ -181,6 +198,7 @@ vim.api.nvim_create_autocmd("QuickFixCmdPost", {
 --   end
 -- })
 
+-- Trigger LSP completion when pressing the '.' key or with the <C-Space> key in insert mode
 vim.api.nvim_create_autocmd('LspAttach', {
   group = vim.api.nvim_create_augroup('my.lsp', {}),
   callback = function(args)
@@ -208,3 +226,28 @@ vim.api.nvim_create_autocmd('LspAttach', {
     end
   end,
 })
+
+-- LSP Inline Completion
+ vim.api.nvim_create_autocmd('LspAttach', {
+   callback = function(args)
+     local bufnr = args.buf
+     local client = assert(vim.lsp.get_client_by_id(args.data.client_id))
+
+     if client:supports_method(vim.lsp.protocol.Methods.textDocument_inlineCompletion, bufnr) then
+       vim.lsp.inline_completion.enable(true, { bufnr = bufnr })
+
+       vim.keymap.set(
+         'i',
+         '<C-F>',
+         vim.lsp.inline_completion.get,
+         { desc = 'LSP: accept inline completion', buffer = bufnr }
+       )
+       vim.keymap.set(
+         'i',
+         '<C-G>',
+         vim.lsp.inline_completion.select,
+         { desc = 'LSP: switch inline completion', buffer = bufnr }
+       )
+     end
+   end
+ })

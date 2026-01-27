@@ -45,7 +45,7 @@
 ---@param client vim.lsp.Client
 local function sign_in(bufnr, client)
   client:request(
-    ---@diagnostic disable-next-line: param-type-mismatch
+  ---@diagnostic disable-next-line: param-type-mismatch
     'signIn',
     vim.empty_dict(),
     function(err, result)
@@ -87,7 +87,7 @@ end
 ---@param client vim.lsp.Client
 local function sign_out(_, client)
   client:request(
-    ---@diagnostic disable-next-line: param-type-mismatch
+  ---@diagnostic disable-next-line: param-type-mismatch
     'signOut',
     vim.empty_dict(),
     function(err, result)
@@ -105,6 +105,7 @@ end
 ---@type vim.lsp.Config
 return {
   cmd = {
+    'npx',
     'copilot-language-server',
     '--stdio',
   },
@@ -121,7 +122,7 @@ return {
   },
   settings = {
     telemetry = {
-      telemetryLevel = 'all',
+      telemetryLevel = 'none',
     },
   },
   on_attach = function(client, bufnr)

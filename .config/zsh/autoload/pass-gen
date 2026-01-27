@@ -1,0 +1,9 @@
+# pass-gen <password-length>
+function pass-gen {
+  if [ $# -lt 1 ]; then
+    echo "Usage: pass-gen <password-length>"
+    return
+  fi
+  tr -dc A-Za-z0-9 </dev/urandom | head -c "$1"
+  echo
+}

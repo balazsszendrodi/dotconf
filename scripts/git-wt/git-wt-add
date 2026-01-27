@@ -1,0 +1,153 @@
+#!/bin/bash
+# git-wt-add - Create a new worktree for a branch
+# Usage: git-wt-add <branch-name> [--force-fetch]
+
+set -e
+
+usage() {
+  echo "Usage: git-wt-add <branch-name> [options]"
+  echo ""
+  echo "Create a new git worktree for the specified branch."
+  echo ""
+  echo "Options:"
+  echo "  --force-fetch    Force fetch the branch even if it's excluded"
+  echo "  --new            Create a new branch (not tracking remote)"
+  echo "  --help           Show this help message"
+  echo ""
+  echo "Example:"
+  echo "  git-wt-add main"
+  echo "  git-wt-add feature/my-feature --new"
+  echo "  git-wt-add binaries --force-fetch"
+  exit 1
+}
+
+# Find the repository root (where .git file or .bare directory exists)
+find_repo_root() {
+  local dir="$PWD"
+  while [[ "$dir" != "/" ]]; do
+    if [[ -f "$dir/.git" ]] || [[ -d "$dir/.bare" ]]; then
+      echo "$dir"
+      return 0
+    fi
+    dir=$(dirname "$dir")
+  done
+  return 1
+}
+
+BRANCH=""
+FORCE_FETCH=false
+NEW_BRANCH=false
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+  case $1 in
+  --force-fetch)
+    FORCE_FETCH=true
+    shift
+    ;;
+  --new)
+    NEW_BRANCH=true
+    shift
+    ;;
+  --help | -h)
+    usage
+    ;;
+  *)
+    if [[ -z "$BRANCH" ]]; then
+      BRANCH="$1"
+    fi
+    shift
+    ;;
+  esac
+done
+
+if [[ -z "$BRANCH" ]]; then
+  echo "Error: Branch name is required"
+  usage
+fi
+
+# Find repository root
+REPO_ROOT=$(find_repo_root) || {
+  echo "Error: Not in a git-wt managed repository"
+  echo "Run this command from within a repository cloned with git-wt-clone"
+  exit 1
+}
+
+BARE_DIR="$REPO_ROOT/.bare"
+# Sanitize branch name for directory (replace / with .)
+WORKTREE_NAME=$(echo "$BRANCH" | tr '/' '.')
+WORKTREE_PATH="$REPO_ROOT/$WORKTREE_NAME"
+
+if [[ -d "$WORKTREE_PATH" ]]; then
+  echo "Error: Worktree directory already exists: $WORKTREE_PATH"
+  echo "If you want to enter it: cd $WORKTREE_PATH"
+  exit 1
+fi
+
+cd "$BARE_DIR"
+
+# Check if this is an excluded branch
+EXCLUDED_BRANCH=$(git config --get worktree.excludedBranch 2>/dev/null || echo "")
+
+if [[ "$BRANCH" == "$EXCLUDED_BRANCH" ]] && [[ "$FORCE_FETCH" != true ]]; then
+  echo "Warning: Branch '$BRANCH' is marked as excluded (contains binaries)."
+  echo ""
+  read -p "This branch may contain large files. Fetch anyway? [y/N] " -n 1 -r
+  echo
+  if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+    echo "Aborted. Use --force-fetch to skip this prompt."
+    exit 1
+  fi
+  FORCE_FETCH=true
+fi
+
+# If force fetching an excluded branch, fetch it explicitly
+if [[ "$BRANCH" == "$EXCLUDED_BRANCH" ]] && [[ "$FORCE_FETCH" == true ]]; then
+  echo "==> Fetching excluded branch '$BRANCH'..."
+  git fetch origin "$BRANCH:refs/remotes/origin/$BRANCH" --filter=blob:none
+fi
+
+if [[ "$NEW_BRANCH" == true ]]; then
+  # Create new branch from current HEAD or default branch
+  echo "==> Creating new branch '$BRANCH'..."
+
+  # Get default branch
+  DEFAULT_BRANCH=$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null | sed 's|origin/||' || echo "main")
+
+  # Create worktree with new branch based on default branch
+  git worktree add -b "$BRANCH" "$WORKTREE_PATH" "origin/$DEFAULT_BRANCH"
+
+  # Set up tracking to the default branch so git pull works
+  git -C "$WORKTREE_PATH" branch --set-upstream-to="origin/$DEFAULT_BRANCH" "$BRANCH"
+else
+  # Check if remote branch exists
+  if ! git show-ref --verify --quiet "refs/remotes/origin/$BRANCH"; then
+    echo "Error: Remote branch 'origin/$BRANCH' not found"
+    echo ""
+    echo "Available remote branches:"
+    git branch -r | grep -v HEAD | sed 's/origin\//  /'
+    echo ""
+    echo "To create a new local branch, use: git-wt-add $BRANCH --new"
+    exit 1
+  fi
+
+  echo "==> Creating worktree for branch '$BRANCH'..."
+
+  # Check if local branch exists
+  if git show-ref --verify --quiet "refs/heads/$BRANCH"; then
+    # Local branch exists, just add worktree
+    git worktree add "$WORKTREE_PATH" "$BRANCH"
+    # Ensure tracking is set up so git pull works
+    git -C "$WORKTREE_PATH" branch --set-upstream-to="origin/$BRANCH" "$BRANCH" 2>/dev/null || true
+  else
+    # Create local branch tracking remote
+    git worktree add --track -b "$BRANCH" "$WORKTREE_PATH" "origin/$BRANCH"
+  fi
+fi
+
+echo ""
+echo "==> Worktree created successfully!"
+echo "    Path: $WORKTREE_PATH"
+echo ""
+echo "To start working:"
+echo "  cd $WORKTREE_PATH"

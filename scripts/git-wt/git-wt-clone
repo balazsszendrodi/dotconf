@@ -1,0 +1,114 @@
+#!/bin/bash
+# git-wt-clone - Clone a repository as a bare repo optimized for worktree workflow
+# Usage: git-wt-clone <repo-url> [directory] [--exclude-branch <branch>]
+
+set -e
+
+usage() {
+  echo "Usage: git-wt-clone <repo-url> [directory] [--exclude-branch <branch>]"
+  echo ""
+  echo "Clone a repository as a bare repo for git worktree workflow."
+  echo ""
+  echo "Options:"
+  echo "  --exclude-branch <branch>  Branch to exclude from default fetches (e.g., branch with binaries)"
+  echo "  --help                     Show this help message"
+  echo ""
+  echo "Example:"
+  echo "  git-wt-clone https://github.com/user/repo.git"
+  echo "  git-wt-clone https://github.com/user/repo.git my-project --exclude-branch binaries"
+  exit 1
+}
+
+REPO_URL=""
+DIRECTORY=""
+EXCLUDE_BRANCH=""
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+  case $1 in
+  --exclude-branch)
+    EXCLUDE_BRANCH="$2"
+    shift 2
+    ;;
+  --help | -h)
+    usage
+    ;;
+  *)
+    if [[ -z "$REPO_URL" ]]; then
+      REPO_URL="$1"
+    elif [[ -z "$DIRECTORY" ]]; then
+      DIRECTORY="$1"
+    fi
+    shift
+    ;;
+  esac
+done
+
+if [[ -z "$REPO_URL" ]]; then
+  echo "Error: Repository URL is required"
+  usage
+fi
+
+# Extract repo name from URL if directory not specified
+if [[ -z "$DIRECTORY" ]]; then
+  DIRECTORY=$(basename "$REPO_URL" .git)
+fi
+
+# Convert to absolute path
+DIRECTORY=$(mkdir -p "$DIRECTORY" && cd "$DIRECTORY" && pwd)
+BARE_DIR="$DIRECTORY/.bare"
+
+echo "==> Cloning $REPO_URL as bare repository..."
+echo "    Target: $DIRECTORY"
+
+# Clone as bare repository into .bare subdirectory
+# Using --filter=blob:none for partial clone (fetches blobs on demand)
+git clone --bare --filter=blob:none "$REPO_URL" "$BARE_DIR"
+
+cd "$BARE_DIR"
+
+# Configure remote fetch to track all branches (bare repos don't do this by default)
+echo "==> Configuring remote tracking..."
+git config remote.origin.fetch "+refs/heads/*:refs/remotes/origin/*"
+
+# If there's an excluded branch, set up fetch refspec to exclude it
+if [[ -n "$EXCLUDE_BRANCH" ]]; then
+  echo "==> Excluding branch '$EXCLUDE_BRANCH' from default fetches..."
+  # Use negative refspec (requires git 2.29+)
+  git config --add remote.origin.fetch "^refs/heads/$EXCLUDE_BRANCH"
+
+  # Store excluded branch info for later use
+  git config worktree.excludedBranch "$EXCLUDE_BRANCH"
+fi
+
+# Fetch remote branches
+echo "==> Fetching remote branches..."
+git fetch origin
+
+# Go back to main directory and set up .git file pointing to bare repo
+cd "$DIRECTORY"
+
+# Create a .git file that points to the bare repo
+echo "gitdir: ./.bare" >.git
+
+# Configure worktrees directory
+cd ".bare"
+git config core.bare false
+git config core.worktree "../"
+
+# Determine default branch
+DEFAULT_BRANCH=$(git symbolic-ref --short refs/remotes/origin/HEAD 2>/dev/null | sed 's|origin/||' || echo "main")
+
+cd "$DIRECTORY"
+
+echo ""
+echo "==> Repository cloned successfully!"
+echo ""
+echo "Available branches:"
+git --git-dir=.bare branch -r | grep -v HEAD | sed 's/origin\//  /'
+echo ""
+echo "To create a worktree for a branch, run:"
+echo "  git-wt-add <branch-name>"
+echo ""
+echo "Default branch appears to be: $DEFAULT_BRANCH"
+echo "To start working, run: git-wt-add $DEFAULT_BRANCH"

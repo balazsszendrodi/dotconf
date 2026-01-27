@@ -1,23 +1,35 @@
 zmodload zsh/zprof
+autoload -U compinit; compinit
 
 if [ -n "${GHOSTTY_RESOURCES_DIR}" ]; then
-    builtin source "${GHOSTTY_RESOURCES_DIR}/shell-integration/zsh/ghostty-integration"
+  builtin source "${GHOSTTY_RESOURCES_DIR}/shell-integration/zsh/ghostty-integration"
 fi
 
-eval "$(ssh-agent -s > /dev/null)"
+eval "$(ssh-agent -s >/dev/null)"
 
 # open man pages in nvim
 export MANPAGER="nvim -c 'Man!' -o -"
 
+# setup autoload for custom functions that are not used that often
+fpath=(~/.config/zsh/autoload $fpath)
+autoload -Uz batdiff update-nvim pass-gen
+
+# load custom functions that are used regularly
+if [ -f ~/.zsh_functions ]; then
+  source ~/.zsh_functions
+fi
+
+appendpath "/usr/local/go/bin"
+appendpath "/opt/glab/bin"
+appendpath "/opt/nvim-linux-x86_64/bin"
+appendpath "/home/balazs/go/bin"
+appendpath "/home/balazs/node-v22.19.0-linux-x64/bin"
+appendpath "/home/balazs/.local/share/nvim/mason/bin"
+# appendpath "/home/balazs/programming/mobile/flutter/bin"
+# appendpath "/opt/android-studio/bin"
+appendpath "/home/balazs/.local/bin"
+
 # Export paths
-export PATH=$PATH:/usr/local/go/bin
-export PATH=$PATH:/home/balazs/go/bin
-export PATH=$PATH:/home/balazs/node-v22.19.0-linux-x64/bin
-export PATH=$PATH:/opt/nvim-linux-x86_64/bin
-export PATH=$PATH:/home/balazs/.local/share/nvim/mason/bin
-export PATH=$PATH:/home/balazs/programming/mobile/flutter/bin
-export PATH=$PATH:/opt/android-studio/bin
-export PATH=$PATH:/home/balazs/.local/bin
 export VISUAL=nvim
 export EDITOR=$VISUAL
 export GIT_EDITOR=$VISUAL
@@ -25,13 +37,12 @@ export SUDO_EDITOR=$VISUAL
 export GOROOT=/usr/local/go
 
 if [[ -n "$SSH_TTY" && "$TERM" = "xterm-ghostty" ]]; then
-    export TERM=xterm-256color
+  export TERM=xterm-256color
 fi
 #
 # Aliases
 [ -f ~/.zsh_aliases ] && source ~/.zsh_aliases
 
-fpath+=${ZDOTDIR:-~}/.zsh_functions
 
 HISTFILE=~/.zsh_history
 HISTSIZE=10000
@@ -40,29 +51,21 @@ setopt appendhistory
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-# Exit yazi on the cwd instead of where it was invoked from. To avoid this press 'Q' to quit instead of 'q'
-function y() {
-	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
-	command yazi "$@" --cwd-file="$tmp"
-	IFS= read -r -d '' cwd < "$tmp"
-	[ -n "$cwd" ] && [ "$cwd" != "$PWD" ] && builtin cd -- "$cwd"
-	rm -f -- "$tmp"
-}
+# Automatically start tmux on shell startup
+if command -v tmux &>/dev/null && [ -n "$PS1" ] && [[ ! "$TERM" =~ screen ]] && [[ ! "$TERM" =~ tmux ]] && [ -z "$TMUX" ]; then
+  tmux a -t default || exec tmux new -s default && exit
+fi
 
-# Syntax highlighting for git diffs
-function batdiff {
-    git diff --name-only --relative --diff-filter=d | xargs bat --diff
-}
 
 # Vi mode settings
 bindkey -v
 # Set key bindings for insert mode (main mode)
-bindkey -M main '^A' beginning-of-line       # Ctrl-a to go to the beginning of the line
-bindkey -M main '^E' end-of-line             # Ctrl-e to go to the end of the line
-bindkey -M main '^K' kill-line               # Ctrl-k to delete everything after the cursor
-bindkey -M main '^U' backward-kill-line      # Ctrl-u to delete everything before the cursor
-bindkey -M main '^Y' yank                    # Ctrl-y to paste the last killed text
-bindkey -M main '^R' fzf-history-widget  # Ctrl-r for reverse search
+bindkey -M main '^A' beginning-of-line  # Ctrl-a to go to the beginning of the line
+bindkey -M main '^E' end-of-line        # Ctrl-e to go to the end of the line
+bindkey -M main '^K' kill-line          # Ctrl-k to delete everything after the cursor
+bindkey -M main '^U' backward-kill-line # Ctrl-u to delete everything before the cursor
+bindkey -M main '^Y' yank               # Ctrl-y to paste the last killed text
+bindkey -M main '^R' fzf-history-widget # Ctrl-r for reverse search
 bindkey -M main '^F' fzf-file-widget
 
 # Reduce the amount of time before vi mode activates
@@ -80,7 +83,7 @@ eval "$(starship init zsh)"
 
 # http_proxy='http://10.158.100.1:8080/'
 minikube_ip='192.168.49.2'
-if grep -qEi "(Microsoft|WSL)" /proc/version &> /dev/null; then
+if grep -qEi "(Microsoft|WSL)" /proc/version &>/dev/null; then
   export BROWSER=brave-browser
 
   http_proxy='http://10.158.100.2:8080'
@@ -100,34 +103,17 @@ fi
 
 eval "$(uv generate-shell-completion zsh)"
 eval "$(uvx --generate-shell-completion zsh)"
-if command -v kpt &> /dev/null && [ -x "$(command -v kpt)" ]; then source <(kpt completion zsh); compdef _kpt kpt; fi
-
+if command -v kpt &>/dev/null && [ -x "$(command -v kpt)" ]; then
+  source <(kpt completion zsh)
+  compdef _kpt kpt
+fi
 
 # fnm
 FNM_PATH="/home/balazs/.local/share/fnm"
 if [ -d "$FNM_PATH" ]; then
   export PATH="$FNM_PATH:$PATH"
-  eval "`fnm env`"
+  eval "$(fnm env)"
 fi
-
-# Upadte nvim to the latest nightly version
-function update-nvim {
-curl -LO https://github.com/neovim/neovim/releases/download/nightly/nvim-linux-x86_64.tar.gz
-sudo rm -rf /opt/nvim-linux-x86_64
-sudo tar -C /opt -xzf nvim-linux-x86_64.tar.gz
-rm nvim-linux-x86_64.tar.gz
-}
-
-# pass-gen <password-length>
-function pass-gen {
-if [ $# -lt 1 ]
-  then
-    echo "Usage: pass-gen <password-length>"
-    return
-  fi
-  tr -dc A-Za-z0-9 </dev/urandom | head -c "$1"; echo
-}
-
 
 # Load Angular CLI autocompletion.
 source <(ng completion script)
