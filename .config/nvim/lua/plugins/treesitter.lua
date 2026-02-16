@@ -1,5 +1,5 @@
 require('nvim-treesitter.configs').setup({
-  ensure_installed = { "c", "lua", "python", "go", "gomod", "gowork", "gosum", "proto", "vim", "vimdoc", "query", "markdown", "markdown_inline", "json5" },
+  ensure_installed = { "c", "lua", "python", "go", "gomod", "gowork", "gosum", "proto", "vim", "vimdoc", "query", "markdown", "markdown_inline", "json5", "zig"},
   servers = {
     -- stylua: ignore
     ["*"] = {
