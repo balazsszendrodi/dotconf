@@ -228,26 +228,140 @@ vim.api.nvim_create_autocmd('LspAttach', {
 })
 
 -- LSP Inline Completion
- vim.api.nvim_create_autocmd('LspAttach', {
-   callback = function(args)
-     local bufnr = args.buf
-     local client = assert(vim.lsp.get_client_by_id(args.data.client_id))
+vim.api.nvim_create_autocmd('LspAttach', {
+  callback = function(args)
+    local bufnr = args.buf
+    local client = assert(vim.lsp.get_client_by_id(args.data.client_id))
 
-     if client:supports_method(vim.lsp.protocol.Methods.textDocument_inlineCompletion, bufnr) then
-       vim.lsp.inline_completion.enable(true, { bufnr = bufnr })
+    if client:supports_method(vim.lsp.protocol.Methods.textDocument_inlineCompletion, bufnr) then
+      vim.lsp.inline_completion.enable(true, { bufnr = bufnr })
 
-       vim.keymap.set(
-         'i',
-         '<C-F>',
-         vim.lsp.inline_completion.get,
-         { desc = 'LSP: accept inline completion', buffer = bufnr }
-       )
-       vim.keymap.set(
-         'i',
-         '<C-G>',
-         vim.lsp.inline_completion.select,
-         { desc = 'LSP: switch inline completion', buffer = bufnr }
-       )
-     end
-   end
- })
+      vim.keymap.set(
+        'i',
+        '<C-F>',
+        vim.lsp.inline_completion.get,
+        { desc = 'LSP: accept inline completion', buffer = bufnr }
+      )
+      vim.keymap.set(
+        'i',
+        '<C-G>',
+        vim.lsp.inline_completion.select,
+        { desc = 'LSP: switch inline completion', buffer = bufnr }
+      )
+    end
+  end
+})
+
+
+---------------------------------------------------------------------
+---                      scratch buffer                           ---
+---------------------------------------------------------------------
+--- This code creates a floating scratch buffer that can be toggled
+--- with a keymap. The buffer is created as a scratch buffer
+--- (not listed, no filetype) and is displayed in the center of the
+--- screen with a rounded border. The buffer will be closed when you
+--- leave it or toggle it again.
+
+-- Configuration
+local SCRATCH_FILE = vim.fn.stdpath('data') .. '/scratch-buffer.txt'
+local scratch_win = nil
+local scratch_buf = nil
+
+-- Function to load content from file
+local function load_scratch_content()
+  local file = io.open(SCRATCH_FILE, 'r')
+  if file then
+    local content = file:read('*all')
+    file:close()
+    return vim.split(content, '\n')
+  end
+  return { '' } -- Return empty line if file doesn't exist
+end
+
+-- Function to save content to file
+local function save_scratch_content()
+  if scratch_buf and vim.api.nvim_buf_is_valid(scratch_buf) then
+    local lines = vim.api.nvim_buf_get_lines(scratch_buf, 0, -1, false)
+    local file = io.open(SCRATCH_FILE, 'w')
+    if file then
+      file:write(table.concat(lines, '\n'))
+      file:close()
+    end
+  end
+end
+
+-- Function to create/toggle the floating scratch buffer
+local function toggle_scratch_buffer()
+  -- If window exists and is valid, close it (and save)
+  if scratch_win and vim.api.nvim_win_is_valid(scratch_win) then
+    save_scratch_content()
+    vim.api.nvim_win_close(scratch_win, true)
+    scratch_win = nil
+    return
+  end
+
+  -- Create or reuse scratch buffer
+  if not scratch_buf or not vim.api.nvim_buf_is_valid(scratch_buf) then
+    scratch_buf = vim.api.nvim_create_buf(false, true)
+    vim.api.nvim_set_option_value('buftype', 'nofile', { buf = scratch_buf })
+    vim.api.nvim_set_option_value('bufhidden', 'hide', { buf = scratch_buf })
+    vim.api.nvim_set_option_value('swapfile', false, { buf = scratch_buf })
+    vim.api.nvim_set_option_value('filetype', 'markdown', { buf = scratch_buf }) -- Optional: syntax highlighting
+
+    -- Load persisted content
+    local content = load_scratch_content()
+    vim.api.nvim_buf_set_lines(scratch_buf, 0, -1, false, content)
+  end
+
+  -- Calculate centered floating window dimensions
+  local width = math.floor(vim.o.columns * 0.9)
+  local height = math.floor(vim.o.lines * 0.9)
+  local row = math.floor((vim.o.lines - height) / 2)
+  local col = math.floor((vim.o.columns - width) / 2)
+
+  -- Window configuration
+  local opts = {
+    relative = 'editor',
+    width = width,
+    height = height,
+    row = row,
+    col = col,
+    style = 'minimal',
+    border = 'rounded',
+    title = ' Scratch Buffer ',
+    title_pos = 'center'
+  }
+
+  -- Open the floating window
+  scratch_win = vim.api.nvim_open_win(scratch_buf, true, opts)
+end
+
+-- Create autocommand group
+local scratch_group = vim.api.nvim_create_augroup('ScratchBuffer', { clear = true })
+
+-- Save on buffer leave
+vim.api.nvim_create_autocmd('BufLeave', {
+  group = scratch_group,
+  callback = function(args)
+    if args.buf == scratch_buf then
+      save_scratch_content()
+      if scratch_win and vim.api.nvim_win_is_valid(scratch_win) then
+        vim.api.nvim_win_close(scratch_win, true)
+        scratch_win = nil
+      end
+    end
+  end
+})
+
+-- Save on Neovim exit
+vim.api.nvim_create_autocmd('VimLeavePre', {
+  group = scratch_group,
+  callback = save_scratch_content
+})
+
+-- Create keymap
+vim.keymap.set('n', '<leader>.', toggle_scratch_buffer, {
+  desc = 'Toggle persistent scratch buffer',
+  noremap = true,
+  silent = true
+})
