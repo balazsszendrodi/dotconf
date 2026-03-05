@@ -6,12 +6,7 @@ require("autocmds")
 vim.pack.add({
   { src = "https://github.com/folke/tokyonight.nvim" },
   { src = "https://github.com/nvim-mini/mini.icons" },
-  -- { src = "https://github.com/nvim-mini/mini.pick" },
-  { src = "https://github.com/ibhagwan/fzf-lua" }, -- alternate picker
-  -- {src = "https://github.com/nvim-telescope/telescope.nvim"}, -- alternate picker
-  -- { src = "https://github.com/nvim-mini/mini.ai" }, -- additional treesitter textobjects
-  -- { src = "https://github.com/nvim-mini/mini.files" },
-  -- yazi
+  { src = "https://github.com/ibhagwan/fzf-lua" },      -- alternate picker
   { src = "https://github.com/nvim-lua/plenary.nvim" }, --dependency of yazi.nvim
   { src = "https://github.com/mikavilpas/yazi.nvim" },
   { src = "https://github.com/lewis6991/gitsigns.nvim" },
@@ -53,7 +48,6 @@ lsp.config('*', {
 lsp.enable({
   "lua_ls",
   "ruff",
-  -- "pyright",
   "pyrefly",
   "gopls",
   "protols",
