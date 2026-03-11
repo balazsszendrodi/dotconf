@@ -61,7 +61,8 @@
 
 ---@type vim.lsp.Config
 return {
-  cmd = { 'yaml-language-server', '--stdio' },
+  -- Use npx so the server is found when npm global bin is not on PATH (e.g. fnm/nvm)
+  cmd = { 'npx', 'yaml-language-server', '--stdio' },
   filetypes = { 'yaml', 'yaml.docker-compose', 'yaml.gitlab', 'yaml.helm-values' },
   root_markers = { '.git' },
   settings = {

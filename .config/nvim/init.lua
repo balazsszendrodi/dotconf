@@ -54,5 +54,7 @@ lsp.enable({
   "copilot", -- TODO: Apply the command in lsp/copilot.lua to attach to sessions
   "dartls",
   "bashls",
-  "zls"
+  "zls",
+  "jsonls",
+  "yamlls",
 })
