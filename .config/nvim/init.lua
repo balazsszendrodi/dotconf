@@ -57,4 +57,5 @@ lsp.enable({
   "zls",
   "jsonls",
   "yamlls",
+  "clangd",
 })

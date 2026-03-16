@@ -29,6 +29,7 @@ appendpath "/home/balazs/.local/share/nvim/mason/bin"
 # appendpath "/home/balazs/programming/mobile/flutter/bin"
 # appendpath "/opt/android-studio/bin"
 appendpath "/home/balazs/.local/bin"
+appendpath "/home/balazs/clangd/clangd_21.1.8/bin"
 
 # Export paths
 export VISUAL=nvim
