@@ -71,12 +71,13 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
--- make it easier to close man-files when opened inline
+-- make it easier to close man-files when opened inline; K = follow man link (override global LSP hover)
 vim.api.nvim_create_autocmd("FileType", {
   group = api.nvim_create_augroup("man_unlisted", { clear = true }),
   pattern = { "man" },
   callback = function(event)
     vim.bo[event.buf].buflisted = false
+    vim.keymap.set("n", "K", "<C-]>", { buffer = event.buf, desc = "Follow man page link" })
   end,
 })
 
