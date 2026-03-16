@@ -77,6 +77,7 @@ vim.api.nvim_create_autocmd("FileType", {
   pattern = { "man" },
   callback = function(event)
     vim.bo[event.buf].buflisted = false
+    -- remap K to follow man page links, since LSP hover is not useful in man pages
     vim.keymap.set("n", "K", "<C-]>", { buffer = event.buf, desc = "Follow man page link" })
   end,
 })
