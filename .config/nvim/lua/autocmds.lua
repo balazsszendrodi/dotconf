@@ -145,8 +145,11 @@ api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
 api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
   pattern = "*.go",
   callback = function()
-    vim.opt_local.makeprg = "golangci-lint run"
-    -- vim.opt_local.makeprg = "go build -o /dev/null"
+    -- look for root of the go project and run build/lint command from there, gomod returns the directory of the go.mod file,
+    -- which is the root of the project but it includes the go.mod file name, so we need to remove it with src/...
+    vim.opt_local.makeprg = "golangci-lint run --path-prefix=$(go env GOMOD)/../"
+    -- alternatively, just run go build ./...
+    -- vim.opt_local.makeprg = "go build $(go env GOMOD)/../..."
     vim.opt_local.errorformat = "%f:%l:%c: %m"
   end,
 })
