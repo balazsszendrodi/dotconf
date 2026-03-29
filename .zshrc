@@ -15,15 +15,15 @@ fpath=(~/.config/zsh/autoload $fpath)
 autoload -Uz batdiff update-nvim pass-gen
 
 # load custom functions that are used regularly
-if [ -f ~/.zsh_functions ]; then
-  source ~/.zsh_functions
+if [ -f ~/.zsh_functions/utils ]; then
+  source ~/.zsh_functions/utils
 fi
 
 appendpath "/usr/local/go/bin"
-appendpath "/opt/glab/bin"
+# appendpath "/opt/glab/bin"
 appendpath "/opt/nvim-linux-x86_64/bin"
 appendpath "/home/balazs/go/bin"
-appendpath "/home/balazs/node-v22.19.0-linux-x64/bin"
+# appendpath "/home/balazs/node-v22.19.0-linux-x64/bin"
 appendpath "/home/balazs/.local/share/nvim/mason/bin"
 # appendpath "/home/balazs/programming/mobile/flutter/bin"
 # appendpath "/opt/android-studio/bin"
