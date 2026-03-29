@@ -22,12 +22,14 @@ fi
 appendpath "/usr/local/go/bin"
 # appendpath "/opt/glab/bin"
 appendpath "/opt/nvim-linux-x86_64/bin"
+appendpath "/opt/zig-x86_64-linux-0.16.0-dev.2565+684032671"
 appendpath "/home/balazs/go/bin"
 # appendpath "/home/balazs/node-v22.19.0-linux-x64/bin"
 appendpath "/home/balazs/.local/share/nvim/mason/bin"
 # appendpath "/home/balazs/programming/mobile/flutter/bin"
 # appendpath "/opt/android-studio/bin"
 appendpath "/home/balazs/.local/bin"
+appendpath "/home/balazs/clangd/clangd_21.1.8/bin"
 
 # Export paths
 export VISUAL=nvim

@@ -71,12 +71,14 @@ vim.api.nvim_create_autocmd("FileType", {
   end,
 })
 
--- make it easier to close man-files when opened inline
+-- make it easier to close man-files when opened inline; K = follow man link (override global LSP hover)
 vim.api.nvim_create_autocmd("FileType", {
   group = api.nvim_create_augroup("man_unlisted", { clear = true }),
   pattern = { "man" },
   callback = function(event)
     vim.bo[event.buf].buflisted = false
+    -- remap K to follow man page links, since LSP hover is not useful in man pages
+    vim.keymap.set("n", "K", "<C-]>", { buffer = event.buf, desc = "Follow man page link" })
   end,
 })
 
@@ -143,8 +145,11 @@ api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
 api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
   pattern = "*.go",
   callback = function()
-    vim.opt_local.makeprg = "golangci-lint run"
-    -- vim.opt_local.makeprg = "go build -o /dev/null"
+    -- look for root of the go project and run build/lint command from there, gomod returns the directory of the go.mod file,
+    -- which is the root of the project but it includes the go.mod file name, so we need to remove it with src/...
+    vim.opt_local.makeprg = "golangci-lint run --path-prefix=$(go env GOMOD)/../"
+    -- alternatively, just run go build ./...
+    -- vim.opt_local.makeprg = "go build $(go env GOMOD)/../..."
     vim.opt_local.errorformat = "%f:%l:%c: %m"
   end,
 })
@@ -228,26 +233,42 @@ vim.api.nvim_create_autocmd('LspAttach', {
 })
 
 -- LSP Inline Completion
- vim.api.nvim_create_autocmd('LspAttach', {
-   callback = function(args)
-     local bufnr = args.buf
-     local client = assert(vim.lsp.get_client_by_id(args.data.client_id))
+vim.api.nvim_create_autocmd('LspAttach', {
+  callback = function(args)
+    local bufnr = args.buf
+    local client = assert(vim.lsp.get_client_by_id(args.data.client_id))
 
-     if client:supports_method(vim.lsp.protocol.Methods.textDocument_inlineCompletion, bufnr) then
-       vim.lsp.inline_completion.enable(true, { bufnr = bufnr })
+    if client:supports_method(vim.lsp.protocol.Methods.textDocument_inlineCompletion, bufnr) then
+      vim.lsp.inline_completion.enable(true, { bufnr = bufnr })
 
-       vim.keymap.set(
-         'i',
-         '<C-F>',
-         vim.lsp.inline_completion.get,
-         { desc = 'LSP: accept inline completion', buffer = bufnr }
-       )
-       vim.keymap.set(
-         'i',
-         '<C-G>',
-         vim.lsp.inline_completion.select,
-         { desc = 'LSP: switch inline completion', buffer = bufnr }
-       )
-     end
-   end
- })
+      vim.keymap.set(
+        'i',
+        '<C-F>',
+        vim.lsp.inline_completion.get,
+        { desc = 'LSP: accept inline completion', buffer = bufnr }
+      )
+      vim.keymap.set(
+        'i',
+        '<C-G>',
+        vim.lsp.inline_completion.select,
+        { desc = 'LSP: switch inline completion', buffer = bufnr }
+      )
+    end
+  end
+})
+
+
+-- Enable treesitter
+
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = { "c", "lua", "python", "go", "gomod", "gowork", "gosum", "proto", "vim", "vimdoc", "query", "markdown", "markdown_inline", "json5", "zig" },
+  callback = function()
+    -- syntax highlighting, provided by Neovim
+    vim.treesitter.start()
+    -- folds, provided by Neovim
+    vim.wo.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+    vim.wo.foldmethod = 'expr'
+    -- indentation, provided by nvim-treesitter
+    vim.bo.indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
+  end,
+})
