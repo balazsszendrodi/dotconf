@@ -15,8 +15,8 @@ fpath=(~/.config/zsh/autoload $fpath)
 autoload -Uz batdiff update-nvim pass-gen
 
 # load custom functions that are used regularly
-if [ -f ~/.zsh_functions/utils ]; then
-  source ~/.zsh_functions/utils
+if [ -f ~/.zsh_functions ]; then
+  source ~/.zsh_functions
 fi
 
 appendpath "/usr/local/go/bin"
