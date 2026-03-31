@@ -19,7 +19,7 @@ vim.pack.add({
   { src = "https://github.com/copilotlsp-nvim/copilot-lsp" }, -- dependency
 })
 -- vim.pack.update() -- udpate all plugins managed by vim.pack
-vim.cmd("colorscheme tokyonight-moon")
+vim.cmd("colorscheme tokyonight-night")
 vim.cmd(":hi statusline guibg=NONE")
 
 -- Plugins
