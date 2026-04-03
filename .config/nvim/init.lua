@@ -14,6 +14,7 @@ vim.pack.add({
   { src = "https://github.com/nvim-treesitter/nvim-treesitter-context" }, -- Shows the the signiture of the funciton on the top while in the scope
   { src = "https://github.com/nvim-treesitter/nvim-treesitter-textobjects" },
   { src = "https://github.com/nvim-lualine/lualine.nvim" },
+  { src = "https://github.com/iamcco/markdown-preview.nvim" },
   -- Copilot
   { src = "https://github.com/github/copilot.vim" },
   { src = "https://github.com/copilotlsp-nvim/copilot-lsp" }, -- dependency
@@ -29,6 +30,7 @@ require('plugins.yazi')
 require('plugins.gitsigns')
 require('plugins.treesitter')
 require('plugins.lualine')
+require('plugins.markdown-preview')
 require('plugins.copilot.copilot-lsp')
 require('plugins.local.scratch').setup()
 

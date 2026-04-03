@@ -121,3 +121,10 @@ fi
 
 # Load Angular CLI autocompletion.
 source <(ng completion script)
+
+# bun completions
+[ -s "/home/balazs/.bun/_bun" ] && source "/home/balazs/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
